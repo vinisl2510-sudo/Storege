@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 public class ProdutoService {
     private final ProdutoRepository produtoRepository;
@@ -30,10 +32,44 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
+    public Produto buscarPorId(Long id) {
+        return produtoRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("Id: " + id + "do produto nao encontrado"));
+    }
+
+    @Transactional
+    public Produto atualizarProduto(Long id, ProdutoRequest prequest) {
+        Produto produtoNovo = buscarPorId(id);
+        if (produtoRepository.findById(produtoNovo.getId()) == null) {
+            throw new IllegalArgumentException("Produto nao existe");
+        }
+
+        validarProduto(prequest.nome(), "nome");
+        validarProduto(prequest.categoria(), "categoria");
+        validarProduto(prequest.descricao(), "descricao");
+        validarPositivo(prequest.preco(), "preco");
+        validarPositivo(prequest.estoque(), "estoque");
+
+        produtoNovo.setNome(prequest.nome());
+        produtoNovo.setCategoria(prequest.categoria());
+        produtoNovo.setDescricao(prequest.descricao());
+        produtoNovo.setPreco(prequest.preco());
+        produtoNovo.setEstoque(prequest.estoque());
+
+        return produtoRepository.save(produtoNovo);
+    }
 
 
     public List<Produto> buscarTodos(){
         return produtoRepository.findAll();
+    }
+
+    @Transactional
+    public void deletarProdutoPorId(Long id) {
+        if (!produtoRepository.existsById(id)) {
+            throw new IllegalArgumentException("Produto não encontrado: " + id);
+        }
+        produtoRepository.deleteById(id);
     }
 
 
