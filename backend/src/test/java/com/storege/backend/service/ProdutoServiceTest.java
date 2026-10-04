@@ -40,8 +40,33 @@ class ProdutoServiceTest {
 
     @Test
     void naoDeveCadastrarProdutoVazio(){
+        // nome em branco
+        ProdutoRequest req = new ProdutoRequest("  ", "Tela 6 pol", 1500.0,
+                "Eletronicos", 10);
 
+        IllegalArgumentException erro = assertThrows(IllegalArgumentException.class,
+                () -> produtoService.cadastrarProduto(req));
+
+        assertEquals("nome é obrigatório", erro.getMessage());
+        verify(produtoRepository, never()).save(any());
     }
 
+    @Test
+    void deveSalvarCadaCampoNoLugarCerto() {
+        // 1. Preparar: o save do mock devolve o próprio produto que recebeu
+        ProdutoRequest req = new ProdutoRequest("Celular", "Tela 6 pol", 1500.0,
+                "Eletronicos", 10);
+        when(produtoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        // 2. Executar
+        Produto salvo = produtoService.cadastrarProduto(req);
+
+        // 3. Verificar: cada valor tem que estar no campo certo
+        assertEquals("Celular", salvo.getNome());
+        assertEquals("Tela 6 pol", salvo.getDescricao());
+        assertEquals("Eletronicos", salvo.getCategoria());
+        assertEquals(1500.0, salvo.getPreco());
+        assertEquals(10, salvo.getEstoque());
+    }
 
 }

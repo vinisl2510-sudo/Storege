@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
-    Optional<Usuario> buscarPorEmail(String email);
-    boolean existeEmail(String email);
-    boolean existeCpf(String cpf);
+    Optional<Usuario> findByEmail(String email);
+    boolean existsByEmail(String email);
+    boolean existsByCpf(String cpf);
 
 }

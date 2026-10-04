@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 @Service
 public class ProdutoService {
     private final ProdutoRepository produtoRepository;
@@ -27,22 +25,19 @@ public class ProdutoService {
         validarPositivo(prequest.preco(), "preco");
         validarPositivo(prequest.estoque(), "estoque");
 
-        Produto produto = new Produto(prequest.nome(), prequest.categoria(),
-                prequest.descricao(), prequest.preco(), prequest.estoque());
+        Produto produto = new Produto(prequest.nome(), prequest.descricao(),
+                prequest.categoria(), prequest.preco(), prequest.estoque());
         return produtoRepository.save(produto);
     }
 
     public Produto buscarPorId(Long id) {
         return produtoRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Id: " + id + "do produto nao encontrado"));
+                .orElseThrow(()-> new IllegalArgumentException("Produto não encontrado: " + id));
     }
 
     @Transactional
     public Produto atualizarProduto(Long id, ProdutoRequest prequest) {
         Produto produtoNovo = buscarPorId(id);
-        if (produtoRepository.findById(produtoNovo.getId()) == null) {
-            throw new IllegalArgumentException("Produto nao existe");
-        }
 
         validarProduto(prequest.nome(), "nome");
         validarProduto(prequest.categoria(), "categoria");

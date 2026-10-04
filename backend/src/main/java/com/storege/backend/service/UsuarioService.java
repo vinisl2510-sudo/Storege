@@ -22,21 +22,21 @@ public class UsuarioService {
         validarObrigatorio(req.cpf(), "CPF");
         validarObrigatorio(req.senha(), "Senha");
 
-        if (usuarioRepository.existeEmail(req.email())) {
+        if (usuarioRepository.existsByEmail(req.email())) {
             throw new IllegalArgumentException("Email já cadastrado");
         }
-        if (usuarioRepository.existeCpf(req.cpf())) {
+        if (usuarioRepository.existsByCpf(req.cpf())) {
             throw new IllegalArgumentException("CPF já cadastrado");
         }
 
-        Usuario usuario = new Usuario(req.nome(), req.email(), req.cpf(),
-                req.senha(), req.telefone());
+        Usuario usuario = new Usuario(req.nome(), req.email(), req.senha(),
+                req.cpf(), req.telefone());
         return usuarioRepository.save(usuario);
     }
 
     @Transactional(readOnly = true)
     public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.buscarPorEmail(email)
+        return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + email));
     }
 
